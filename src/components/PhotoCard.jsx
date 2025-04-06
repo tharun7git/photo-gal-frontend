@@ -57,7 +57,7 @@ const PhotoCard = ({ photo, onDelete, onUpdate }) => {
     <div className="photo-card">
       {!isEditing ? (
         <>
-          <Link to={`/photo/${photo.id}`}>
+          <Link to={`/photo/${photo.id}/${encodeURIComponent(photo.image.split('/').pop())}`}>
             <div className="photo-image">
               <img src={photo.image} alt={photo.title} />
             </div>
