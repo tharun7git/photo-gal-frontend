@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
-// Create axios instance
 const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,7 +9,6 @@ const apiClient = axios.create({
   },
 });
 
-// Add token to requests
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -22,7 +20,6 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle token expiration
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -41,7 +38,6 @@ apiClient.interceptors.response.use(
         
         return apiClient(originalRequest);
       } catch (err) {
-        // Refresh token expired, redirect to login
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
@@ -52,7 +48,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Authentication services
 export const authService = {
   login: async (credentials) => {
     const response = await axios.post(`${API_URL}/token/`, credentials);
@@ -76,7 +71,7 @@ export const authService = {
   }
 };
 
-// Photo services
+
 export const photoService = {
   getAllPhotos: () => apiClient.get('/photos/'),
   
@@ -121,7 +116,7 @@ export const photoService = {
     apiClient.post(`/photos/${photoId}/move_to_folder/`, { folder_id: folderId }),
 };
 
-// Folder services
+
 export const folderService = {
   getAllFolders: () => apiClient.get('/folders/'),
   
