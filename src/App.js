@@ -66,7 +66,7 @@ function App() {
               } 
             />
             <Route 
-              path="/photo/:id" 
+              path="/photo/:id/:imageName" 
               element={
                 <PrivateRoute>
                   <PhotoDetail />
