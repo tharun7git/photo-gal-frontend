@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { photoService, folderService } from '../services/api';
 import PhotoCard from '../components/PhotoCard';
 
@@ -14,6 +14,7 @@ const FolderView = () => {
     folder: id
   });
   const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate(); // Use useNavigate hook
 
   useEffect(() => {
     fetchFolder();
@@ -81,6 +82,18 @@ const FolderView = () => {
     }
   };
 
+  const handleDeleteFolder = async () => {
+    if (window.confirm(`Are you sure you want to delete the folder "${folder.name}" and all its photos?`)) {
+      try {
+        await folderService.deleteFolder(id);
+        navigate('/');
+      } catch (error) {
+        console.error('Error deleting folder:', error);
+        alert('Failed to delete folder');
+      }
+    }
+  };
+
   if (!folder) return <div>Loading...</div>;
 
   return (
@@ -139,6 +152,7 @@ const FolderView = () => {
           <p>No photos in this folder yet. Upload some photos!</p>
         )}
       </div>
+      <button onClick={handleDeleteFolder} className="btn btn-danger">Delete Folder</button>
       <Link to="/">Back to Dashboard</Link>
     </div>
   );
