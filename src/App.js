@@ -8,10 +8,67 @@ import Dashboard from './pages/Dashboard';
 import FolderView from './pages/FolderView';
 import PhotoDetail from './pages/PhotoDetail';
 import NotFound from './pages/NotFound';
+
+// Define constants outside the component
+const INACTIVE_TIMEOUT =  60 * 1000; // 5 minutes in milliseconds
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Set up user activity timeout handler
+  useEffect(() => {
+    // Only set up inactivity monitoring when a user is logged in
+    if (!user) {
+      return;
+    }
+
+    let inactivityTimeout;
+
+    const resetTimer = () => {
+      // Clear any existing timeout
+      if (inactivityTimeout) {
+        clearTimeout(inactivityTimeout);
+      }
+      
+      // Set new timeout
+      inactivityTimeout = setTimeout(() => {
+        console.log('User inactive for 5 minutes, logging out');
+        authService.logout();
+        setUser(null);
+      }, INACTIVE_TIMEOUT);
+    };
+
+    // Initial timer setup
+    resetTimer();
+    
+    // Setup event listeners for user activity
+    const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
+    
+    const handleActivity = () => {
+      resetTimer();
+    };
+    
+    // Register activity event listeners
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleActivity);
+    });
+    
+    // Cleanup function
+    return () => {
+      // Remove all event listeners
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+      
+      // Clear any existing timeout
+      if (inactivityTimeout) {
+        clearTimeout(inactivityTimeout);
+      }
+    };
+  }, [user]); // Since INACTIVE_TIMEOUT is now defined outside, it's not needed in dependencies
+
+  // Check for existing user session
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
